@@ -1,0 +1,35 @@
+// have const and var as 2 variable declarations
+
+const x: number = 10
+var y: number = 1
+
+print(x + 1) // error
+print(y + 1) // fine
+
+// structs and methods on structs -- NO INHERITANCE
+// enforce uppercase struct naming
+struct MyStruct {
+    // fields are private by default unless marked with pub
+    pub x: number
+    y: number
+
+    pub init() {} // private by default
+    privateFunction() {}
+}
+
+//stupid simple enums, fields are always caps and MUST be accessed via Color.RED
+// this way enum values are not thrust into the global namespace but still keep simple properties like C
+enum Color {
+    RED
+    BLUE
+    GREEN
+}
+
+
+error union as the return type from functions
+fn myFunction(x: int) bool? {
+
+}
+
+//primitive types
+true, false, string, number, null

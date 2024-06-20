@@ -1,0 +1,17 @@
+//!expose (std)
+//let x = 23;
+//let name string = "kaleb";
+
+//fn getNum() number {
+//    return 1;
+//}
+
+fn main() {
+    let num = 10;
+    let numAddr = &num;
+    let myChar char = 'g';
+    printf("number %f has address %p", num, numAddr);
+    printf("address %p has value %f", numAddr, *numAddr);
+    printf("%c", myChar);
+    return; 
+}

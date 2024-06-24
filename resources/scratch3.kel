@@ -1,4 +1,13 @@
 fn main() {
-    printf("Hello Pookie");
+    let x = 9;
+
+    if x == 1 {
+        printf("x is 1");
+    } elif x == 2 {
+        printf("x is 2");
+    } else {
+        printf("x is 0");
+    }
+
     return;
 }

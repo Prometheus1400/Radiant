@@ -5,13 +5,13 @@ import (
 )
 
 type VisitStmt interface{
-	VisitFnStmt(stmt *FnStmt)
 	VisitPrintStmt(stmt *PrintStmt)
 	VisitExpressionStmt(stmt *ExpressionStmt)
 	VisitReturnStmt(stmt *ReturnStmt)
 	VisitIfStmt(stmt *IfStmt)
 	VisitBlockStmt(stmt *BlockStmt)
 	VisitVarStmt(stmt *VarStmt)
+	VisitFnStmt(stmt *FnStmt)
 }
 
 type Type struct {
@@ -22,6 +22,22 @@ type Param struct {
 	Name scanner.Token
 	Type Type
 }
+
+type IfStmt struct {
+	IfCondition Expr
+	IfBlock Stmt
+	ElifConditions []Expr
+	ElifBlocks []Stmt
+	ElseBlock Stmt
+}
+func (e *IfStmt) stmt() {}
+func (e *IfStmt) Visit(visitor VisitStmt) {visitor.VisitIfStmt(e)}
+
+type BlockStmt struct {
+	Body []Stmt
+}
+func (e *BlockStmt) stmt() {}
+func (e *BlockStmt) Visit(visitor VisitStmt) {visitor.VisitBlockStmt(e)}
 
 type VarStmt struct {
 	Name scanner.Token
@@ -57,18 +73,4 @@ type ReturnStmt struct {
 }
 func (e *ReturnStmt) stmt() {}
 func (e *ReturnStmt) Visit(visitor VisitStmt) {visitor.VisitReturnStmt(e)}
-
-type IfStmt struct {
-	Condition Expr
-	IfBlock Stmt
-	ElseBlock Stmt
-}
-func (e *IfStmt) stmt() {}
-func (e *IfStmt) Visit(visitor VisitStmt) {visitor.VisitIfStmt(e)}
-
-type BlockStmt struct {
-	Body []Stmt
-}
-func (e *BlockStmt) stmt() {}
-func (e *BlockStmt) Visit(visitor VisitStmt) {visitor.VisitBlockStmt(e)}
 

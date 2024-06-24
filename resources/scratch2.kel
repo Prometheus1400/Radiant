@@ -11,7 +11,7 @@ fn fib(n number) number {
 }
 
 fn main() {
-    let num = 48;
+    let num = 40;
     let res = fib(num);
     printf("fib(%.0f) is %.0f", num, res);
     return; 

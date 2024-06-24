@@ -59,6 +59,7 @@ func getKeywords() map[string]TokenType {
 		"false":  FALSE,
 		"fn":     FN,
 		"if":     IF,
+		"elif":   ELIF,
 		"else":   ELSE,
 		"return": RETURN,
 		"number": TYPE,

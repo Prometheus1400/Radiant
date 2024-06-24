@@ -147,18 +147,30 @@ func (g *IRGenerator) VisitVarStmt(stmt *ast.VarStmt) {
 }
 
 func (g *IRGenerator) VisitIfStmt(stmt *ast.IfStmt) {
-	conditionVal := g.evaluate(stmt.Condition)
+	conditionVal := g.evaluate(stmt.IfCondition)
 	ifBlock := llvm.AddBasicBlock(g.currentFunction, "ifBlock")
 	elseBlock := llvm.AddBasicBlock(g.currentFunction, "elseBlock")
 	mergeBlock := llvm.AddBasicBlock(g.currentFunction, "mergeBlock")
 
-	// g.builder.SetInsertPointAtEnd(entryBlock)
 	g.builder.CreateCondBr(conditionVal, ifBlock, elseBlock)
 
 	g.builder.SetInsertPointAtEnd(ifBlock)
 	g.execute(stmt.IfBlock)
 	g.builder.CreateBr(mergeBlock)
 	g.builder.SetInsertPointAtEnd(elseBlock)
+    for i, _ := range stmt.ElifConditions {
+        elifBlock := llvm.AddBasicBlock(g.currentFunction, fmt.Sprint("elifBlock-%d", i))
+        elifElseBlock := llvm.AddBasicBlock(g.currentFunction, fmt.Sprint("elifElseBlock-%d", i))
+
+        elifCondition := g.evaluate(stmt.ElifConditions[i])
+        elifStmts := stmt.ElifBlocks[i]
+
+        g.builder.CreateCondBr(elifCondition, elifBlock, elifElseBlock)
+        g.builder.SetInsertPointAtEnd(elifBlock)
+        g.execute(elifStmts)
+        g.builder.CreateBr(mergeBlock)
+        g.builder.SetInsertPointAtEnd(elifElseBlock)
+    }
 	if stmt.ElseBlock != nil {
 		g.execute(stmt.ElseBlock)
 	}

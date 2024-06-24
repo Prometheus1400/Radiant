@@ -52,6 +52,7 @@ const (
 	FN
 	RETURN
 	IF
+    ELIF
 	ELSE
 	// STRING_TYPE
 	// NUMBER_TYPE
@@ -65,7 +66,6 @@ const (
 	placeholders_end
 
 	// TODO: implement these more difficult concepts
-	// ELIF
 	// DOTDOT                       // ..
 	// DOTDOTDOT                    // ...
 	// STRUCT
@@ -191,6 +191,8 @@ func TokenKindString(token *Token) string {
 		return "fn"
 	case IF:
 		return "if"
+	case ELIF:
+		return "elif"
 	case ELSE:
 		return "else"
 	case RETURN:

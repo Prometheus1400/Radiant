@@ -91,7 +91,7 @@ func main() {
 		"Print":      "Expression Expr",
 		"Expression": "Expression Expr",
 		"Return":     "Expression Expr",
-		"If":         "Condition Expr, IfBlock Stmt, ElseBlock Stmt",
+		"If":         "IfCondition Expr, IfBlock Stmt, ElifConditions []Expr, ElifBlocks []Stmt, ElseBlock Stmt",
 	}
 	writeStatementVisitorInterface(stmts, stmtString)
 	writeStatements(stmts, stmtString)

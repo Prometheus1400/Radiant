@@ -26,12 +26,20 @@ const (
 
 type ParseRule struct {
 	PrefixRule func(p *Parser) (ast.Expr, error)
-	InfixRule  func(p *Parser, left ast.Expr) (ast.Expr, error) 
+	InfixRule  func(p *Parser, left ast.Expr) (ast.Expr, error)
 	Precedence Precedence
 }
 
 type ParseTable struct {
 	table map[scanner.TokenType]ParseRule
+}
+
+type SugaredIfStatement struct {
+	IfCondition    ast.Expr
+	IfBlock        ast.Stmt
+	ElifConditions []ast.Expr
+	ElifBlocks     []ast.Stmt
+	ElseBlock      ast.Stmt
 }
 
 func NewParseTable() *ParseTable {
@@ -290,7 +298,7 @@ func (p *Parser) returnStmt() (ast.Stmt, error) {
 }
 
 func (p *Parser) ifStmt() (ast.Stmt, error) {
-	condition, err := p.expression()
+	ifCondition, err := p.expression()
 	if err != nil {
 		return nil, err
 	}
@@ -302,6 +310,26 @@ func (p *Parser) ifStmt() (ast.Stmt, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	elifConditions := make([]ast.Expr, 0)
+	elifBlocks := make([]ast.Stmt, 0)
+	for p.match(scanner.ELIF) {
+		elifCondition, err := p.expression()
+		if err != nil {
+			return nil, err
+		}
+		_, err = p.consume(scanner.LEFT_BRACE, "expect block after elif condition")
+		if err != nil {
+			return nil, err
+		}
+		elifBlock, err := p.blockStmt()
+		if err != nil {
+			return nil, err
+		}
+		elifConditions = append(elifConditions, elifCondition)
+		elifBlocks = append(elifBlocks, elifBlock)
+	}
+
 	var elseBlock ast.Stmt = nil
 	if p.match(scanner.ELSE) {
 		_, err = p.consume(scanner.LEFT_BRACE, "expect block after else condition")
@@ -313,8 +341,29 @@ func (p *Parser) ifStmt() (ast.Stmt, error) {
 			return nil, err
 		}
 	}
-	return &ast.IfStmt{Condition: condition, IfBlock: ifBlock, ElseBlock: elseBlock}, nil
+	// ifStmt := SugaredIfStatement{
+	// 	IfCondition:    ifCondition,
+	// 	IfBlock:        ifBlock,
+	// 	ElifConditions: elifConditions,
+	// 	ElifBlocks:     elifBlocks,
+	// 	ElseBlock:      elseBlock,
+	// }
+	return &ast.IfStmt{IfCondition: ifCondition, IfBlock: ifBlock, ElifConditions: elifConditions, ElifBlocks: elifBlocks, ElseBlock: elseBlock}, nil
 }
+
+// de-sugar the if elseif else into just if else
+// func (p *Parser) desugarIfStmt(input SugaredIfStatement) (ast.Stmt, error) {
+// 	// var toReturn ast.IfStmt
+//     // first pass
+// 	if input.IfCondition != nil {
+//         input.IfCondition = nil
+// 		rest, err := p.desugarIfStmt(input)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 		return &ast.IfStmt{Condition: input.IfCondition, IfBlock: input.IfBlock, ElseBlock: rest}, nil
+// 	}
+// }
 
 func (p *Parser) blockStmt() (ast.Stmt, error) {
 	stmts := make([]ast.Stmt, 0)
